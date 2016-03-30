@@ -8,8 +8,13 @@
 
 using namespace std;
 
+enum DIRECTION {ASCENDING, DESCENDING};
+
 template<typename T>
-void print(const vector<T>&list, char* title);
+struct printtypes
+{
+typedef void (*print_ptr)(const vector<T>&, char*);
+};
 
 template<typename T>
 size_t maxOfList(const vector<T>& list);
@@ -22,16 +27,28 @@ void initialize(vector<T> &list);
 template<typename T>
 void binSort(vector<T> &list);
 
+template<typename T>
+void printAscending(const vector<T>&list, char* title);
+
+template<typename T>
+void printDescending(const vector<T>&list, char* title);
+
+
 int main()
 {
    vector<size_t> list;
+   string line;
    srand(time(NULL));
+   printtypes<size_t>::print_ptr prints[2] = {printAscending, printDescending};
    initialize(list);
    cout<<"Generated numbers and starting to sort"<<endl;
-   //print(list,"unsorted");
+   printAscending(list,"unsorted");
    binSort(list);
    cout<<"Sort finished"<<endl;
-   //print(list,"sorted");
+   cin.ignore(INT_MAX, '\n');
+   cout<<"Display in [a]scending or [d]escending order? ";
+   getline(cin, line);
+   prints[tolower(line[0]) == 'd'](list, "sorted");
 }
 
 
@@ -81,7 +98,7 @@ size_t maxOfList(const vector<T>& list)
 }
 
 template<typename T>
-void print(const vector<T>&list, char* title)
+void printAscending(const vector<T>&list, char* title)
 {
     size_t digits = 2 + log10(maxOfList(list))+1,
            col = 65/digits;
@@ -89,6 +106,21 @@ void print(const vector<T>&list, char* title)
     for(size_t i = 0; i < list.size(); ++i)
     {
         if(!(i%col))
+            cout<<endl;
+        cout<<setw(digits)<<list[i];
+    }
+    cout<<endl<<endl;
+}
+
+template<typename T>
+void printDescending(const vector<T>&list, char* title)
+{
+    size_t digits = 2 + log10(maxOfList(list))+1,
+           col = 65/digits;
+    cout<<"Your "<<title<<" list is: "<<endl;
+    for(int i = list.size()-1; i >= 0; --i)
+    {
+        if(!((list.size()-i-1)%col))
             cout<<endl;
         cout<<setw(digits)<<list[i];
     }
